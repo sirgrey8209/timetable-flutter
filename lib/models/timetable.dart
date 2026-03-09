@@ -103,7 +103,7 @@ class TimetableData {
       if (gradeData != null) {
         final classData = gradeData['3'] ?? gradeData[3];
         if (classData != null && classData is List) {
-          schedule = (classData as List).map((day) {
+          schedule = classData.map((day) {
             if (day is List) {
               return day.map((code) => code is int ? code : 0).toList().cast<int>();
             }

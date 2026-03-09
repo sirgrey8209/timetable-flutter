@@ -32,8 +32,8 @@ void callbackDispatcher() {
       }
 
       return true;
-    } catch (e) {
-      print('Background task failed: $e');
+    } catch (_) {
+      // Background task failed silently
       return false;
     }
   });
