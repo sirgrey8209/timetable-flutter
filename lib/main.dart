@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'services/widget_service.dart';
+import 'services/background_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 위젯 서비스 초기화
+  // 서비스 초기화
   await WidgetService.initialize();
+  await BackgroundService.initialize();
+
+  // 주기적 백그라운드 갱신 등록
+  await BackgroundService.registerPeriodicTask();
 
   // 위젯 클릭 시 앱 열기
   WidgetService.registerInteractivityCallback((uri) async {
