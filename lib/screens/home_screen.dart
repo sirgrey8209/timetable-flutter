@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../models/timetable.dart';
 import '../services/api_service.dart';
 import '../services/cache_service.dart';
+import '../services/widget_service.dart';
 import '../widgets/timetable_table.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -47,6 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // 캐시 저장
       await CacheService.saveTimetable(json, _selectedWeek);
+
+      // 위젯 업데이트
+      await WidgetService.updateWidget(timetable);
 
       setState(() {
         _timetable = timetable;
