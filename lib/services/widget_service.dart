@@ -26,16 +26,19 @@ class WidgetService {
 
     // 시간표 데이터를 JSON으로 저장
     final scheduleData = <String, dynamic>{};
+    const dayKeys = ['mon', 'tue', 'wed', 'thu', 'fri']; // Kotlin 위젯과 키 일치
 
     for (int day = 0; day < 5; day++) {
-      final dayKey = TimetableConstants.dayNames[day];
-      final dayClasses = <Map<String, String>>[];
+      final dayKey = dayKeys[day];
+      final dayClasses = <Map<String, dynamic>>[];
 
       for (int period = 1; period <= 7; period++) {
         final classInfo = timetable.getClass(day, period);
+        final isChanged = timetable.isChanged(day, period);
         dayClasses.add({
           'subject': classInfo?.subject ?? '',
           'teacher': classInfo?.teacher ?? '',
+          'changed': isChanged,
         });
       }
 

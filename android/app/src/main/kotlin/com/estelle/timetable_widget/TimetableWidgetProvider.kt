@@ -37,8 +37,11 @@ class TimetableWidgetProvider : AppWidgetProvider() {
         private const val COLOR_TODAY = 0xFFE3F2FD.toInt()       // 오늘 열 배경색 (파란색 계열)
         private const val COLOR_CURRENT = 0xFFFFF9C4.toInt()     // 현재 교시 배경색 (노란색 계열)
         private const val COLOR_TODAY_CURRENT = 0xFFC8E6C9.toInt() // 오늘 + 현재 교시 (녹색 계열)
+        private const val COLOR_CHANGED = 0xFFFFCDD2.toInt()     // 변경된 수업 (연한 빨강)
         private const val COLOR_HEADER = 0xFFF8F9FA.toInt()       // 헤더 배경색
         private const val COLOR_TRANSPARENT = Color.TRANSPARENT
+        private const val COLOR_TEXT_CHANGED = 0xFFC62828.toInt() // 변경된 수업 텍스트 (빨강)
+        private const val COLOR_TEXT_NORMAL = 0xFF333333.toInt()  // 일반 텍스트 (어두운 회색)
 
         // 셀 ID 매핑 (period, day) -> R.id.cell_period_day
         private val cellIds = arrayOf(
@@ -127,16 +130,19 @@ class TimetableWidgetProvider : AppWidgetProvider() {
                     val cellId = cellIds[period][day]
                     val dayKey = dayKeys[day]
 
-                    // 과목명 가져오기
+                    // 과목명과 변경 여부 가져오기
                     var subjectName = ""
+                    var isChanged = false
                     if (schedule.has(dayKey)) {
                         val daySchedule = schedule.getJSONArray(dayKey)
                         if (period < daySchedule.length()) {
                             val periodData = daySchedule.opt(period)
-                            subjectName = when (periodData) {
-                                is JSONObject -> periodData.optString("subject", "")
-                                is String -> periodData
-                                else -> ""
+                            when (periodData) {
+                                is JSONObject -> {
+                                    subjectName = periodData.optString("subject", "")
+                                    isChanged = periodData.optBoolean("changed", false)
+                                }
+                                is String -> subjectName = periodData
                             }
                         }
                     }
@@ -144,8 +150,13 @@ class TimetableWidgetProvider : AppWidgetProvider() {
                     // 텍스트 설정
                     views.setTextViewText(cellId, subjectName)
 
-                    // 배경색 설정
+                    // 텍스트 색상 설정 (변경된 수업은 빨간색)
+                    val textColor = if (isChanged) COLOR_TEXT_CHANGED else COLOR_TEXT_NORMAL
+                    views.setTextColor(cellId, textColor)
+
+                    // 배경색 설정 (변경된 수업이 우선)
                     val backgroundColor = when {
+                        isChanged -> COLOR_CHANGED
                         day == todayIndex && period == currentPeriod - 1 -> COLOR_TODAY_CURRENT
                         day == todayIndex -> COLOR_TODAY
                         period == currentPeriod - 1 -> COLOR_CURRENT
