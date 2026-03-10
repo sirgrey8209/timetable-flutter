@@ -93,8 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
       // 캐시 저장
       await CacheService.saveTimetable(json, _selectedWeek);
 
-      // 위젯 업데이트
-      await WidgetService.updateWidget(timetable);
+      // 위젯 업데이트 (현재 주차 인덱스 전달)
+      await WidgetService.updateWidget(timetable, weekIndex: _currentWeekIndex);
 
       // UI 업데이트
       if (mounted) {

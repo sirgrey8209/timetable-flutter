@@ -7,77 +7,201 @@
     android:background="@android:color/white"
     android:padding="4dp">
 
-    <!-- 헤더 행 -->
+    <!-- 상단 네비게이션 바 (주차, 날짜, 좌우 버튼) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingTop="2dp"
+        android:paddingBottom="4dp">
+
+        <!-- 이전 주차 버튼 -->
+        <TextView
+            android:id="@+id/btn_prev"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:text="◀"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:textColor="#4A90D9"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <!-- 주차 + 날짜 범위 (클릭시 새로고침) -->
+        <LinearLayout
+            android:id="@+id/date_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:id="@+id/week_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1주차 "
+                android:textSize="11sp"
+                android:textColor="#888888"/>
+
+            <TextView
+                android:id="@+id/date_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3/9~3/14"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#333333"/>
+
+        </LinearLayout>
+
+        <!-- 다음 주차 버튼 -->
+        <TextView
+            android:id="@+id/btn_next"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:text="▶"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:textColor="#4A90D9"
+            android:clickable="true"
+            android:focusable="true"/>
+
+    </LinearLayout>
+
+    <!-- 헤더 행 (날짜 + 요일) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#F8F9FA">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.8"
-            android:text="교시"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:layout_weight="0.6"
+            android:text=""
+            android:textSize="9sp"
             android:gravity="center"
-            android:padding="2dp"
-            android:background="#F8F9FA"/>
+            android:padding="2dp"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/header_mon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="월"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp"/>
+            android:padding="2dp">
+            <TextView
+                android:id="@+id/date_mon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3/9"
+                android:textSize="8sp"
+                android:textColor="#888888"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="월"
+                android:textSize="10sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/header_tue"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="화"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp"/>
+            android:padding="2dp">
+            <TextView
+                android:id="@+id/date_tue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3/10"
+                android:textSize="8sp"
+                android:textColor="#888888"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="화"
+                android:textSize="10sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/header_wed"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="수"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp"/>
+            android:padding="2dp">
+            <TextView
+                android:id="@+id/date_wed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3/11"
+                android:textSize="8sp"
+                android:textColor="#888888"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="수"
+                android:textSize="10sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/header_thu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="목"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp"/>
+            android:padding="2dp">
+            <TextView
+                android:id="@+id/date_thu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3/12"
+                android:textSize="8sp"
+                android:textColor="#888888"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="목"
+                android:textSize="10sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/header_fri"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="금"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:orientation="vertical"
             android:gravity="center"
-            android:padding="2dp"/>
+            android:padding="2dp">
+            <TextView
+                android:id="@+id/date_fri"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3/13"
+                android:textSize="8sp"
+                android:textColor="#888888"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="금"
+                android:textSize="10sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -92,61 +216,142 @@
             android:id="@+id/period_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
+            android:layout_weight="0.6"
             android:text="1"
-            android:textSize="9sp"
+            android:textSize="10sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:background="#F8F9FA"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_1_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_1_1_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_1_1_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_1_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_1_2_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_1_2_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_1_3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_1_3_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_1_3_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_1_4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_1_4_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_1_4_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_1_5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_1_5_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_1_5_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -161,61 +366,142 @@
             android:id="@+id/period_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
+            android:layout_weight="0.6"
             android:text="2"
-            android:textSize="9sp"
+            android:textSize="10sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:background="#F8F9FA"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_2_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_2_1_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_2_1_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_2_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_2_2_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_2_2_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_2_3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_2_3_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_2_3_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_2_4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_2_4_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_2_4_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_2_5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_2_5_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_2_5_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -230,61 +516,142 @@
             android:id="@+id/period_3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
+            android:layout_weight="0.6"
             android:text="3"
-            android:textSize="9sp"
+            android:textSize="10sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:background="#F8F9FA"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_3_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_3_1_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_3_1_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_3_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_3_2_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_3_2_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_3_3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_3_3_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_3_3_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_3_4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_3_4_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_3_4_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_3_5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_3_5_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_3_5_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -299,61 +666,142 @@
             android:id="@+id/period_4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
+            android:layout_weight="0.6"
             android:text="4"
-            android:textSize="9sp"
+            android:textSize="10sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:background="#F8F9FA"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_4_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_4_1_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_4_1_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_4_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_4_2_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_4_2_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_4_3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_4_3_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_4_3_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_4_4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_4_4_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_4_4_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_4_5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_4_5_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_4_5_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -368,61 +816,142 @@
             android:id="@+id/period_5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
+            android:layout_weight="0.6"
             android:text="5"
-            android:textSize="9sp"
+            android:textSize="10sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:background="#F8F9FA"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_5_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_5_1_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_5_1_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_5_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_5_2_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_5_2_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_5_3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_5_3_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_5_3_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_5_4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_5_4_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_5_4_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_5_5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_5_5_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_5_5_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -437,61 +966,142 @@
             android:id="@+id/period_6"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
+            android:layout_weight="0.6"
             android:text="6"
-            android:textSize="9sp"
+            android:textSize="10sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:background="#F8F9FA"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_6_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_6_1_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_6_1_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_6_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_6_2_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_6_2_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_6_3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_6_3_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_6_3_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_6_4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_6_4_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_6_4_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_6_5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_6_5_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_6_5_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -506,62 +1116,154 @@
             android:id="@+id/period_7"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
+            android:layout_weight="0.6"
             android:text="7"
-            android:textSize="9sp"
+            android:textSize="10sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:background="#F8F9FA"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_7_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_7_1_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_7_1_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_7_2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_7_2_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_7_2_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_7_3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_7_3_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_7_3_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_7_4"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_7_4_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_7_4_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/cell_7_5"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:textSize="8sp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:ellipsize="end"/>
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/cell_7_5_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+            <TextView
+                android:id="@+id/cell_7_5_teacher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="7sp"
+                android:textColor="#666666"
+                android:gravity="center"
+                android:maxLines="1"/>
+        </LinearLayout>
 
     </LinearLayout>
+
+    <!-- 하단 업데이트 시간 -->
+    <TextView
+        android:id="@+id/last_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="업데이트: --"
+        android:textSize="8sp"
+        android:textColor="#888888"
+        android:gravity="center"
+        android:paddingTop="2dp"/>
 
 </LinearLayout>
