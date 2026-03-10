@@ -85,10 +85,9 @@ class TimetableWidgetProvider : AppWidgetProvider() {
         private const val ACTION_OPEN_APP = "com.estelle.timetable_widget.OPEN_APP"
 
         // API 설정
-        private const val API_BASE_URL = "http://comci.net:4082/36179_T?NzM2MTdfNzlfMV8w"
-        private const val SCHOOL_CODE = "36179"
-        private const val GRADE = 1
-        private const val CLASS_NUM = 3
+        private const val API_BASE_URL = "http://comci.net:4082"
+        private const val SCHOOL_CODE = 27224
+        private const val API_PREFIX = 73629
 
         // 색상 상수
         private const val COLOR_TODAY = 0xFFE3F2FD.toInt()
@@ -391,6 +390,17 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             fetchTimetableDataForWeek(context, weekNumber, weekIndex, weekLabel, isCurrentWeek)
         }
 
+        private fun buildApiUrl(weekNumber: Int): String {
+            // Flutter와 동일한 방식으로 URL 생성
+            // params = "73629_27224_0_weekNumber"
+            val params = "${API_PREFIX}_${SCHOOL_CODE}_0_$weekNumber"
+            val encoded = android.util.Base64.encodeToString(
+                params.toByteArray(Charsets.UTF_8),
+                android.util.Base64.NO_WRAP
+            )
+            return "$API_BASE_URL/36179?$encoded"
+        }
+
         private fun fetchTimetableDataForWeek(
             context: Context,
             weekNumber: Int,
@@ -400,7 +410,7 @@ class TimetableWidgetProvider : AppWidgetProvider() {
         ) {
             executor.execute {
                 try {
-                    val url = URL("$API_BASE_URL&${weekNumber}")
+                    val url = URL(buildApiUrl(weekNumber))
                     val connection = url.openConnection() as HttpURLConnection
                     connection.requestMethod = "GET"
                     connection.connectTimeout = 10000
