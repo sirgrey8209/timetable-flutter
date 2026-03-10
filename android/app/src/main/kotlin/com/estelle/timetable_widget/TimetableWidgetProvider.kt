@@ -7,10 +7,21 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.widget.RemoteViews
+import android.widget.Toast
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.Executors
 
 class TimetableWidgetProvider : AppWidgetProvider() {
 
@@ -27,15 +38,27 @@ class TimetableWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
 
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val appWidgetIds = appWidgetManager.getAppWidgetIds(
+            ComponentName(context, TimetableWidgetProvider::class.java)
+        )
+
         when (intent.action) {
             ACTION_REFRESH -> {
-                // 새로고침: 앱을 실행하여 데이터 갱신
-                val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-                launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(launchIntent)
+                // 새로고침: API 호출
+                Toast.makeText(context, "새로고침 중...", Toast.LENGTH_SHORT).show()
+                fetchTimetableData(context)
             }
-            ACTION_PREV_WEEK, ACTION_NEXT_WEEK -> {
-                // 주차 변경: 앱을 실행
+            ACTION_PREV_WEEK -> {
+                // 이전 주차
+                changeWeek(context, -1)
+            }
+            ACTION_NEXT_WEEK -> {
+                // 다음 주차
+                changeWeek(context, 1)
+            }
+            ACTION_OPEN_APP -> {
+                // 앱 열기
                 val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
                 launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(launchIntent)
@@ -53,25 +76,33 @@ class TimetableWidgetProvider : AppWidgetProvider() {
 
     companion object {
         private const val PREFS_NAME = "HomeWidgetPreferences"
+        private const val WIDGET_PREFS_NAME = "WidgetPreferences"
 
         // 액션 상수
         private const val ACTION_REFRESH = "com.estelle.timetable_widget.REFRESH"
         private const val ACTION_PREV_WEEK = "com.estelle.timetable_widget.PREV_WEEK"
         private const val ACTION_NEXT_WEEK = "com.estelle.timetable_widget.NEXT_WEEK"
+        private const val ACTION_OPEN_APP = "com.estelle.timetable_widget.OPEN_APP"
+
+        // API 설정
+        private const val API_BASE_URL = "http://comci.net:4082/36179_T?NzM2MTdfNzlfMV8w"
+        private const val SCHOOL_CODE = "36179"
+        private const val GRADE = 1
+        private const val CLASS_NUM = 3
 
         // 색상 상수
-        private const val COLOR_TODAY = 0xFFE3F2FD.toInt()       // 오늘 열 배경색 (파란색 계열)
-        private const val COLOR_CURRENT = 0xFFFFF9C4.toInt()     // 현재 교시 배경색 (노란색 계열)
-        private const val COLOR_TODAY_CURRENT = 0xFFC8E6C9.toInt() // 오늘 + 현재 교시 (녹색 계열)
-        private const val COLOR_CHANGED = 0xFFFFCDD2.toInt()     // 변경된 수업 (연한 빨강)
-        private const val COLOR_HEADER = 0xFFF8F9FA.toInt()       // 헤더 배경색
+        private const val COLOR_TODAY = 0xFFE3F2FD.toInt()
+        private const val COLOR_CURRENT = 0xFFFFF9C4.toInt()
+        private const val COLOR_TODAY_CURRENT = 0xFFC8E6C9.toInt()
+        private const val COLOR_CHANGED = 0xFFFFCDD2.toInt()
+        private const val COLOR_HEADER = 0xFFF8F9FA.toInt()
         private const val COLOR_TRANSPARENT = Color.TRANSPARENT
-        private const val COLOR_TEXT_CHANGED = 0xFFC62828.toInt() // 변경된 수업 텍스트 (빨강)
-        private const val COLOR_TEXT_NORMAL = 0xFF333333.toInt()  // 일반 텍스트 (어두운 회색)
-        private const val COLOR_TEXT_TEACHER = 0xFF666666.toInt() // 선생님 텍스트 (회색)
-        private const val COLOR_TEXT_TODAY = 0xFF1976D2.toInt()   // 오늘 헤더 텍스트 (파란색)
+        private const val COLOR_TEXT_CHANGED = 0xFFC62828.toInt()
+        private const val COLOR_TEXT_NORMAL = 0xFF333333.toInt()
+        private const val COLOR_TEXT_TEACHER = 0xFF666666.toInt()
+        private const val COLOR_TEXT_TODAY = 0xFF1976D2.toInt()
 
-        // 셀 컨테이너 ID 매핑 (period, day) -> R.id.cell_period_day
+        // 셀 컨테이너 ID 매핑
         private val cellContainerIds = arrayOf(
             intArrayOf(R.id.cell_1_1, R.id.cell_1_2, R.id.cell_1_3, R.id.cell_1_4, R.id.cell_1_5),
             intArrayOf(R.id.cell_2_1, R.id.cell_2_2, R.id.cell_2_3, R.id.cell_2_4, R.id.cell_2_5),
@@ -82,7 +113,6 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             intArrayOf(R.id.cell_7_1, R.id.cell_7_2, R.id.cell_7_3, R.id.cell_7_4, R.id.cell_7_5)
         )
 
-        // 셀 과목 ID 매핑
         private val cellSubjectIds = arrayOf(
             intArrayOf(R.id.cell_1_1_subject, R.id.cell_1_2_subject, R.id.cell_1_3_subject, R.id.cell_1_4_subject, R.id.cell_1_5_subject),
             intArrayOf(R.id.cell_2_1_subject, R.id.cell_2_2_subject, R.id.cell_2_3_subject, R.id.cell_2_4_subject, R.id.cell_2_5_subject),
@@ -93,7 +123,6 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             intArrayOf(R.id.cell_7_1_subject, R.id.cell_7_2_subject, R.id.cell_7_3_subject, R.id.cell_7_4_subject, R.id.cell_7_5_subject)
         )
 
-        // 셀 선생님 ID 매핑
         private val cellTeacherIds = arrayOf(
             intArrayOf(R.id.cell_1_1_teacher, R.id.cell_1_2_teacher, R.id.cell_1_3_teacher, R.id.cell_1_4_teacher, R.id.cell_1_5_teacher),
             intArrayOf(R.id.cell_2_1_teacher, R.id.cell_2_2_teacher, R.id.cell_2_3_teacher, R.id.cell_2_4_teacher, R.id.cell_2_5_teacher),
@@ -104,23 +133,23 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             intArrayOf(R.id.cell_7_1_teacher, R.id.cell_7_2_teacher, R.id.cell_7_3_teacher, R.id.cell_7_4_teacher, R.id.cell_7_5_teacher)
         )
 
-        // 헤더 컨테이너 ID
         private val headerContainerIds = intArrayOf(
             R.id.header_mon, R.id.header_tue, R.id.header_wed,
             R.id.header_thu, R.id.header_fri
         )
 
-        // 헤더 날짜 ID
         private val headerDateIds = intArrayOf(
             R.id.date_mon, R.id.date_tue, R.id.date_wed,
             R.id.date_thu, R.id.date_fri
         )
 
-        // 교시 ID
         private val periodIds = intArrayOf(
             R.id.period_1, R.id.period_2, R.id.period_3, R.id.period_4,
             R.id.period_5, R.id.period_6, R.id.period_7
         )
+
+        private val executor = Executors.newSingleThreadExecutor()
+        private val handler = Handler(Looper.getMainLooper())
 
         fun updateAppWidget(
             context: Context,
@@ -128,18 +157,27 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             appWidgetId: Int
         ) {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val widgetPrefs = context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
             val views = RemoteViews(context.packageName, R.layout.timetable_widget)
 
             // SharedPreferences에서 데이터 읽기
             val scheduleJson = prefs.getString("schedule", null)
             val startDateStr = prefs.getString("startDate", null)
             val lastUpdate = prefs.getString("lastUpdate", null)
-            val weekLabel = prefs.getString("weekLabel", "1주차")
+            val weekLabel = prefs.getString("weekLabel", "1주차 ")
             val dateRange = prefs.getString("dateRange", "")
+
+            // 위젯 전용 주차 인덱스 (없으면 Flutter에서 설정한 값 사용)
+            val currentWeekIndex = widgetPrefs.getInt("widgetWeekIndex", -1)
+            val totalWeeks = widgetPrefs.getInt("totalWeeks", 0)
 
             // 현재 요일과 교시 계산
             val todayIndex = getCurrentDayIndex()
             val currentPeriod = getCurrentPeriod()
+
+            // 현재 주차가 이번 주인지 확인 (오늘 하이라이트 표시 여부)
+            val isCurrentWeek = widgetPrefs.getBoolean("isCurrentWeek", true)
+            val effectiveTodayIndex = if (isCurrentWeek) todayIndex else -1
 
             // 클릭 이벤트 설정
             setupClickActions(context, views)
@@ -149,13 +187,13 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.date_range, dateRange)
 
             // 헤더 날짜 및 배경색 설정
-            setHeaderDates(views, startDateStr, todayIndex)
+            setHeaderDates(views, startDateStr, effectiveTodayIndex)
 
             // 교시 배경색 설정 (현재 교시 강조)
-            setPeriodColors(views, currentPeriod)
+            setPeriodColors(views, if (isCurrentWeek) currentPeriod else -1)
 
             // 하단 업데이트 시간 설정
-            if (lastUpdate != null) {
+            if (lastUpdate != null && lastUpdate.isNotEmpty()) {
                 views.setTextViewText(R.id.last_update, "업데이트: $lastUpdate")
             } else {
                 views.setTextViewText(R.id.last_update, "업데이트: --")
@@ -164,7 +202,7 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             // 시간표 데이터가 있으면 그리드 업데이트
             if (scheduleJson != null) {
                 try {
-                    updateTimetableGrid(views, scheduleJson, todayIndex, currentPeriod)
+                    updateTimetableGrid(views, scheduleJson, effectiveTodayIndex, if (isCurrentWeek) currentPeriod else -1)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     clearTimetableGrid(views)
@@ -177,7 +215,7 @@ class TimetableWidgetProvider : AppWidgetProvider() {
         }
 
         private fun setupClickActions(context: Context, views: RemoteViews) {
-            // 날짜 영역 클릭 -> 새로고침 (앱 실행)
+            // 날짜 영역 클릭 -> 새로고침
             val refreshIntent = Intent(context, TimetableWidgetProvider::class.java).apply {
                 action = ACTION_REFRESH
             }
@@ -207,23 +245,421 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             )
             views.setOnClickPendingIntent(R.id.btn_next, nextPendingIntent)
 
-            // 전체 위젯 클릭 -> 앱 실행
-            val appIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-            if (appIntent != null) {
-                val appPendingIntent = PendingIntent.getActivity(
-                    context, 3, appIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-                views.setOnClickPendingIntent(R.id.widget_container, appPendingIntent)
+            // 시간표 영역 클릭 -> 앱 열기
+            val appIntent = Intent(context, TimetableWidgetProvider::class.java).apply {
+                action = ACTION_OPEN_APP
+            }
+            val appPendingIntent = PendingIntent.getBroadcast(
+                context, 3, appIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            // 각 교시 행에 클릭 이벤트 설정
+            for (period in 0 until 7) {
+                for (day in 0 until 5) {
+                    views.setOnClickPendingIntent(cellContainerIds[period][day], appPendingIntent)
+                }
+            }
+        }
+
+        private fun changeWeek(context: Context, delta: Int) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val widgetPrefs = context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
+
+            // 주차 정보 가져오기
+            val weeksJson = prefs.getString("weeksData", null)
+            if (weeksJson == null) {
+                Toast.makeText(context, "주차 정보가 없습니다", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            try {
+                val weeks = JSONArray(weeksJson)
+                val totalWeeks = weeks.length()
+                if (totalWeeks == 0) {
+                    Toast.makeText(context, "주차 정보가 없습니다", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
+                // 현재 위젯 주차 인덱스
+                var currentIndex = widgetPrefs.getInt("widgetWeekIndex", 0)
+                val newIndex = currentIndex + delta
+
+                // 범위 체크
+                if (newIndex < 0 || newIndex >= totalWeeks) {
+                    return
+                }
+
+                // 새 주차 정보 가져오기
+                val weekData = weeks.getJSONArray(newIndex)
+                val weekNumber = weekData.getInt(0)
+                val weekLabel = weekData.getString(1)
+
+                // 현재 주차인지 확인
+                val systemCurrentWeek = findCurrentWeek(weeks)
+                val isCurrentWeek = (newIndex == findCurrentWeekIndex(weeks))
+
+                // 저장
+                widgetPrefs.edit()
+                    .putInt("widgetWeekIndex", newIndex)
+                    .putInt("widgetWeekNumber", weekNumber)
+                    .putBoolean("isCurrentWeek", isCurrentWeek)
+                    .apply()
+
+                // API 호출하여 해당 주차 데이터 가져오기
+                fetchTimetableDataForWeek(context, weekNumber, newIndex, weekLabel, isCurrentWeek)
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(context, "주차 변경 실패", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        private fun findCurrentWeek(weeks: JSONArray): Int {
+            val today = Calendar.getInstance()
+            val dateFormat = SimpleDateFormat("yy-MM-dd", Locale.getDefault())
+
+            for (i in 0 until weeks.length()) {
+                try {
+                    val weekData = weeks.getJSONArray(i)
+                    val label = weekData.getString(1) // "26-03-09 ~ 26-03-14"
+                    val parts = label.split(" ~ ")
+                    if (parts.size == 2) {
+                        val startDate = dateFormat.parse(parts[0])
+                        val endDate = dateFormat.parse(parts[1])
+                        if (startDate != null && endDate != null) {
+                            val todayTime = today.time
+                            if (todayTime >= startDate && todayTime <= endDate) {
+                                return weekData.getInt(0)
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    continue
+                }
+            }
+            return if (weeks.length() > 0) weeks.getJSONArray(0).getInt(0) else 1
+        }
+
+        private fun findCurrentWeekIndex(weeks: JSONArray): Int {
+            val today = Calendar.getInstance()
+            val dateFormat = SimpleDateFormat("yy-MM-dd", Locale.getDefault())
+
+            for (i in 0 until weeks.length()) {
+                try {
+                    val weekData = weeks.getJSONArray(i)
+                    val label = weekData.getString(1)
+                    val parts = label.split(" ~ ")
+                    if (parts.size == 2) {
+                        val startDate = dateFormat.parse(parts[0])
+                        val endDate = dateFormat.parse(parts[1])
+                        if (startDate != null && endDate != null) {
+                            val todayTime = today.time
+                            if (todayTime >= startDate && todayTime <= endDate) {
+                                return i
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    continue
+                }
+            }
+            return 0
+        }
+
+        private fun fetchTimetableData(context: Context) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val widgetPrefs = context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
+
+            // 현재 주차 번호 가져오기
+            val weekNumber = widgetPrefs.getInt("widgetWeekNumber", 1)
+            val weekIndex = widgetPrefs.getInt("widgetWeekIndex", 0)
+            val isCurrentWeek = widgetPrefs.getBoolean("isCurrentWeek", true)
+
+            // 주차 레이블 가져오기
+            var weekLabel = ""
+            val weeksJson = prefs.getString("weeksData", null)
+            if (weeksJson != null) {
+                try {
+                    val weeks = JSONArray(weeksJson)
+                    if (weekIndex < weeks.length()) {
+                        val weekData = weeks.getJSONArray(weekIndex)
+                        weekLabel = weekData.getString(1)
+                    }
+                } catch (e: Exception) {}
+            }
+
+            fetchTimetableDataForWeek(context, weekNumber, weekIndex, weekLabel, isCurrentWeek)
+        }
+
+        private fun fetchTimetableDataForWeek(
+            context: Context,
+            weekNumber: Int,
+            weekIndex: Int,
+            weekLabel: String,
+            isCurrentWeek: Boolean
+        ) {
+            executor.execute {
+                try {
+                    val url = URL("$API_BASE_URL&${weekNumber}")
+                    val connection = url.openConnection() as HttpURLConnection
+                    connection.requestMethod = "GET"
+                    connection.connectTimeout = 10000
+                    connection.readTimeout = 10000
+
+                    val responseCode = connection.responseCode
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        val reader = BufferedReader(InputStreamReader(connection.inputStream, "UTF-8"))
+                        val response = StringBuilder()
+                        var line: String?
+                        while (reader.readLine().also { line = it } != null) {
+                            response.append(line)
+                        }
+                        reader.close()
+
+                        // JSON 파싱 및 저장
+                        val jsonStr = cleanJsonResponse(response.toString())
+                        val json = JSONObject(jsonStr)
+
+                        // 데이터 파싱 및 저장
+                        parseAndSaveTimetable(context, json, weekIndex, weekLabel, isCurrentWeek)
+
+                        handler.post {
+                            Toast.makeText(context, "업데이트 완료", Toast.LENGTH_SHORT).show()
+                            refreshWidget(context)
+                        }
+                    } else {
+                        handler.post {
+                            Toast.makeText(context, "서버 오류: $responseCode", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    connection.disconnect()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    handler.post {
+                        Toast.makeText(context, "연결 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        private fun cleanJsonResponse(response: String): String {
+            // "자료 = {...}" 형태에서 JSON만 추출
+            val startIndex = response.indexOf("{")
+            val endIndex = response.lastIndexOf("}")
+            return if (startIndex >= 0 && endIndex > startIndex) {
+                response.substring(startIndex, endIndex + 1)
+            } else {
+                response
+            }
+        }
+
+        private fun parseAndSaveTimetable(
+            context: Context,
+            json: JSONObject,
+            weekIndex: Int,
+            weekLabel: String,
+            isCurrentWeek: Boolean
+        ) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val widgetPrefs = context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
+            val editor = prefs.edit()
+            val widgetEditor = widgetPrefs.edit()
+
+            try {
+                // 과목 목록
+                val subjects = mutableListOf<String>()
+                val subjectsArray = json.optJSONArray("자료492")
+                if (subjectsArray != null) {
+                    for (i in 0 until subjectsArray.length()) {
+                        subjects.add(subjectsArray.optString(i, ""))
+                    }
+                }
+
+                // 선생님 목록
+                val teachers = mutableListOf<String>()
+                val teachersArray = json.optJSONArray("자료446")
+                if (teachersArray != null) {
+                    for (i in 0 until teachersArray.length()) {
+                        teachers.add(teachersArray.optString(i, "").replace("*", ""))
+                    }
+                }
+
+                // 현재 시간표 (자료481)
+                val schedule481 = json.optJSONArray("자료481")
+                val currentSchedule = parseSchedule(schedule481, subjects, teachers)
+
+                // 원래 시간표 (자료147) - 변경 확인용
+                val schedule147 = json.optJSONArray("자료147")
+                val originalSchedule = parseSchedule(schedule147, subjects, teachers)
+
+                // 변경 여부 추가
+                val scheduleWithChanges = addChangedFlags(currentSchedule, originalSchedule)
+
+                // 시작일
+                val startDate = json.optString("시작일", "")
+
+                // 마지막 업데이트
+                val lastUpdate = json.optString("자료244", "")
+
+                // 주차 정보 저장
+                val weeksArray = json.optJSONArray("일자자료")
+                if (weeksArray != null) {
+                    editor.putString("weeksData", weeksArray.toString())
+
+                    // 현재 주차 인덱스 찾기
+                    if (weekIndex < 0) {
+                        val currentIdx = findCurrentWeekIndex(weeksArray)
+                        widgetEditor.putInt("widgetWeekIndex", currentIdx)
+                        widgetEditor.putBoolean("isCurrentWeek", true)
+                        if (currentIdx < weeksArray.length()) {
+                            val weekData = weeksArray.getJSONArray(currentIdx)
+                            widgetEditor.putInt("widgetWeekNumber", weekData.getInt(0))
+                        }
+                    }
+                }
+
+                // 날짜 범위 포맷
+                val dateRange = formatDateRange(weekLabel)
+
+                // SharedPreferences에 저장
+                editor.putString("schedule", scheduleWithChanges.toString())
+                editor.putString("startDate", startDate)
+                editor.putString("lastUpdate", lastUpdate)
+                editor.putString("weekLabel", "${weekIndex + 1}주차 ")
+                editor.putString("dateRange", dateRange)
+
+                widgetEditor.putBoolean("isCurrentWeek", isCurrentWeek)
+
+                editor.apply()
+                widgetEditor.apply()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        private fun parseSchedule(
+            scheduleData: JSONArray?,
+            subjects: List<String>,
+            teachers: List<String>
+        ): JSONObject {
+            val result = JSONObject()
+            val dayKeys = arrayOf("mon", "tue", "wed", "thu", "fri")
+
+            if (scheduleData == null || scheduleData.length() <= 1) {
+                return result
+            }
+
+            try {
+                // 1학년 = index 1
+                val gradeData = scheduleData.optJSONArray(1) ?: return result
+
+                // 3반 = index 3
+                if (gradeData.length() <= 3) return result
+                val classData = gradeData.optJSONArray(3) ?: return result
+
+                for (day in 0 until 5) {
+                    val dayArray = JSONArray()
+                    val dayIndex = day + 1 // classData[0]은 메타
+
+                    if (dayIndex < classData.length()) {
+                        val periods = classData.optJSONArray(dayIndex)
+                        if (periods != null) {
+                            for (period in 1..7) { // period 0은 메타
+                                if (period < periods.length()) {
+                                    val code = periods.optInt(period, 0)
+                                    val subjectCode = code / 1000
+                                    val teacherCode = code % 1000
+
+                                    val subjectName = if (subjectCode < subjects.size) subjects[subjectCode] else ""
+                                    val teacherName = if (teacherCode < teachers.size) teachers[teacherCode] else ""
+
+                                    val periodObj = JSONObject()
+                                    periodObj.put("subject", subjectName)
+                                    periodObj.put("teacher", teacherName)
+                                    periodObj.put("code", code)
+                                    dayArray.put(periodObj)
+                                } else {
+                                    dayArray.put(JSONObject().apply {
+                                        put("subject", "")
+                                        put("teacher", "")
+                                        put("code", 0)
+                                    })
+                                }
+                            }
+                        }
+                    }
+
+                    result.put(dayKeys[day], dayArray)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            return result
+        }
+
+        private fun addChangedFlags(current: JSONObject, original: JSONObject): JSONObject {
+            val dayKeys = arrayOf("mon", "tue", "wed", "thu", "fri")
+
+            for (dayKey in dayKeys) {
+                val currentDay = current.optJSONArray(dayKey) ?: continue
+                val originalDay = original.optJSONArray(dayKey)
+
+                for (period in 0 until currentDay.length()) {
+                    val currentPeriod = currentDay.optJSONObject(period) ?: continue
+                    val currentCode = currentPeriod.optInt("code", 0)
+
+                    var isChanged = false
+                    if (originalDay != null && period < originalDay.length()) {
+                        val originalPeriod = originalDay.optJSONObject(period)
+                        val originalCode = originalPeriod?.optInt("code", 0) ?: 0
+                        isChanged = currentCode != originalCode && currentCode != 0
+                    }
+
+                    currentPeriod.put("changed", isChanged)
+                }
+            }
+
+            return current
+        }
+
+        private fun formatDateRange(label: String): String {
+            try {
+                val parts = label.split(" ~ ")
+                if (parts.size == 2) {
+                    val start = formatShortDate(parts[0])
+                    val end = formatShortDate(parts[1])
+                    return "$start~$end"
+                }
+            } catch (e: Exception) {}
+            return label
+        }
+
+        private fun formatShortDate(dateStr: String): String {
+            val parts = dateStr.split("-")
+            if (parts.size == 3) {
+                val month = parts[1].toIntOrNull() ?: return dateStr
+                val day = parts[2].toIntOrNull() ?: return dateStr
+                return "$month/$day"
+            }
+            return dateStr
+        }
+
+        private fun refreshWidget(context: Context) {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val appWidgetIds = appWidgetManager.getAppWidgetIds(
+                ComponentName(context, TimetableWidgetProvider::class.java)
+            )
+            for (appWidgetId in appWidgetIds) {
+                updateAppWidget(context, appWidgetManager, appWidgetId)
             }
         }
 
         private fun setHeaderDates(views: RemoteViews, startDateStr: String?, todayIndex: Int) {
-            // 시작 날짜 파싱
             var startDate: Calendar? = null
-            if (startDateStr != null) {
+            if (startDateStr != null && startDateStr.isNotEmpty()) {
                 try {
-                    // ISO 8601 형식: 2025-03-10T00:00:00.000
                     val parts = startDateStr.split("T")[0].split("-")
                     if (parts.size == 3) {
                         startDate = Calendar.getInstance().apply {
@@ -238,7 +674,6 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             }
 
             for (i in 0 until 5) {
-                // 날짜 설정
                 if (startDate != null) {
                     val dayDate = startDate.clone() as Calendar
                     dayDate.add(Calendar.DAY_OF_MONTH, i)
@@ -246,11 +681,9 @@ class TimetableWidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(headerDateIds[i], dateText)
                 }
 
-                // 오늘 열 하이라이트
                 val bgColor = if (i == todayIndex) COLOR_TODAY else COLOR_TRANSPARENT
                 views.setInt(headerContainerIds[i], "setBackgroundColor", bgColor)
 
-                // 오늘 날짜 텍스트 색상 변경
                 val textColor = if (i == todayIndex) COLOR_TEXT_TODAY else 0xFF888888.toInt()
                 views.setTextColor(headerDateIds[i], textColor)
             }
@@ -279,7 +712,6 @@ class TimetableWidgetProvider : AppWidgetProvider() {
                     val teacherId = cellTeacherIds[period][day]
                     val dayKey = dayKeys[day]
 
-                    // 과목명, 선생님, 변경 여부 가져오기
                     var subjectName = ""
                     var teacherName = ""
                     var isChanged = false
@@ -299,19 +731,14 @@ class TimetableWidgetProvider : AppWidgetProvider() {
                         }
                     }
 
-                    // 과목명 설정
                     views.setTextViewText(subjectId, subjectName)
-
-                    // 선생님 설정
                     views.setTextViewText(teacherId, teacherName)
 
-                    // 텍스트 색상 설정 (변경된 수업은 빨간색)
                     val subjectColor = if (isChanged) COLOR_TEXT_CHANGED else COLOR_TEXT_NORMAL
                     val teacherColor = if (isChanged) COLOR_TEXT_CHANGED else COLOR_TEXT_TEACHER
                     views.setTextColor(subjectId, subjectColor)
                     views.setTextColor(teacherId, teacherColor)
 
-                    // 배경색 설정 (변경된 수업이 우선)
                     val backgroundColor = when {
                         isChanged -> COLOR_CHANGED
                         day == todayIndex && period == currentPeriod - 1 -> COLOR_TODAY_CURRENT
@@ -346,7 +773,7 @@ class TimetableWidgetProvider : AppWidgetProvider() {
                 Calendar.WEDNESDAY -> 2
                 Calendar.THURSDAY -> 3
                 Calendar.FRIDAY -> 4
-                else -> -1  // 주말
+                else -> -1
             }
         }
 
@@ -356,23 +783,22 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             val minute = calendar.get(Calendar.MINUTE)
             val totalMinutes = hour * 60 + minute
 
-            // 교시별 시간 범위 (시작~종료)
             val periodRanges = arrayOf(
-                540 to 590,   // 1교시: 09:00~09:50
-                595 to 645,   // 2교시: 09:55~10:45
-                650 to 700,   // 3교시: 10:50~11:40
-                705 to 755,   // 4교시: 11:45~12:35
-                810 to 860,   // 5교시: 13:30~14:20
-                865 to 915,   // 6교시: 14:25~15:15
-                920 to 970    // 7교시: 15:20~16:10
+                540 to 590,
+                595 to 645,
+                650 to 700,
+                705 to 755,
+                810 to 860,
+                865 to 915,
+                920 to 970
             )
 
             for (i in periodRanges.indices) {
                 if (totalMinutes in periodRanges[i].first..periodRanges[i].second) {
-                    return i + 1  // 1-indexed
+                    return i + 1
                 }
             }
-            return -1  // 수업 시간이 아님
+            return -1
         }
     }
 }

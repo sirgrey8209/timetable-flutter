@@ -30,6 +30,10 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.estelle.timetable_widget.REFRESH" />
+                <action android:name="com.estelle.timetable_widget.PREV_WEEK" />
+                <action android:name="com.estelle.timetable_widget.NEXT_WEEK" />
+                <action android:name="com.estelle.timetable_widget.OPEN_APP" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

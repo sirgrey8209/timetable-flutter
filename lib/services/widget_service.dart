@@ -59,6 +59,9 @@ class WidgetService {
       }
     }
 
+    // 주차 데이터를 JSON 배열로 저장 (위젯에서 주차 변경 시 필요)
+    final weeksData = timetable.weeks.map((w) => [w.weekNumber, w.label]).toList();
+
     // 위젯 데이터 저장
     await HomeWidget.saveWidgetData('schedule', jsonEncode(scheduleData));
     await HomeWidget.saveWidgetData('todayIndex', todayIndex);
@@ -67,6 +70,7 @@ class WidgetService {
     await HomeWidget.saveWidgetData('startDate', timetable.startDate.toIso8601String());
     await HomeWidget.saveWidgetData('weekLabel', weekLabel);
     await HomeWidget.saveWidgetData('dateRange', dateRange);
+    await HomeWidget.saveWidgetData('weeksData', jsonEncode(weeksData));
 
     // 위젯 갱신 요청
     await HomeWidget.updateWidget(
