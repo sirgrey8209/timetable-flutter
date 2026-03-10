@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.widget.RemoteViews
@@ -43,23 +44,14 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             ComponentName(context, TimetableWidgetProvider::class.java)
         )
 
-        // 디버그: 받은 액션 표시
-        Toast.makeText(context, "액션: ${intent.action}", Toast.LENGTH_SHORT).show()
-
         when (intent.action) {
             ACTION_REFRESH -> {
-                // 새로고침: API 호출
-                Toast.makeText(context, "새로고침 중...", Toast.LENGTH_SHORT).show()
                 fetchTimetableData(context)
             }
             ACTION_PREV_WEEK -> {
-                // 이전 주차
-                Toast.makeText(context, "이전 주차", Toast.LENGTH_SHORT).show()
                 changeWeek(context, -1)
             }
             ACTION_NEXT_WEEK -> {
-                // 다음 주차
-                Toast.makeText(context, "다음 주차", Toast.LENGTH_SHORT).show()
                 changeWeek(context, 1)
             }
             ACTION_OPEN_APP -> {
@@ -218,45 +210,44 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
 
-        private fun setupClickActions(context: Context, views: RemoteViews) {
-            // 날짜 영역 클릭 -> 새로고침
-            val refreshIntent = Intent(ACTION_REFRESH).apply {
-                setClass(context, TimetableWidgetProvider::class.java)
-            }
-            val refreshPendingIntent = PendingIntent.getBroadcast(
-                context, 0, refreshIntent,
+        // Android 버전에 따른 PendingIntent 플래그
+        private fun getPendingIntentFlags(): Int {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+        }
+
+        private fun setupClickActions(context: Context, views: RemoteViews) {
+            val flags = getPendingIntentFlags()
+
+            // 날짜 영역 클릭 -> 새로고침
+            val refreshIntent = Intent(context, TimetableWidgetProvider::class.java).apply {
+                action = ACTION_REFRESH
+            }
+            val refreshPendingIntent = PendingIntent.getBroadcast(context, 0, refreshIntent, flags)
             views.setOnClickPendingIntent(R.id.date_container, refreshPendingIntent)
 
             // 이전 주차 버튼 클릭
-            val prevIntent = Intent(ACTION_PREV_WEEK).apply {
-                setClass(context, TimetableWidgetProvider::class.java)
+            val prevIntent = Intent(context, TimetableWidgetProvider::class.java).apply {
+                action = ACTION_PREV_WEEK
             }
-            val prevPendingIntent = PendingIntent.getBroadcast(
-                context, 1, prevIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
+            val prevPendingIntent = PendingIntent.getBroadcast(context, 1, prevIntent, flags)
             views.setOnClickPendingIntent(R.id.btn_prev, prevPendingIntent)
 
             // 다음 주차 버튼 클릭
-            val nextIntent = Intent(ACTION_NEXT_WEEK).apply {
-                setClass(context, TimetableWidgetProvider::class.java)
+            val nextIntent = Intent(context, TimetableWidgetProvider::class.java).apply {
+                action = ACTION_NEXT_WEEK
             }
-            val nextPendingIntent = PendingIntent.getBroadcast(
-                context, 2, nextIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
+            val nextPendingIntent = PendingIntent.getBroadcast(context, 2, nextIntent, flags)
             views.setOnClickPendingIntent(R.id.btn_next, nextPendingIntent)
 
             // 시간표 영역 클릭 -> 앱 열기
-            val appIntent = Intent(ACTION_OPEN_APP).apply {
-                setClass(context, TimetableWidgetProvider::class.java)
+            val appIntent = Intent(context, TimetableWidgetProvider::class.java).apply {
+                action = ACTION_OPEN_APP
             }
-            val appPendingIntent = PendingIntent.getBroadcast(
-                context, 3, appIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
+            val appPendingIntent = PendingIntent.getBroadcast(context, 3, appIntent, flags)
             // 각 교시 행에 클릭 이벤트 설정
             for (period in 0 until 7) {
                 for (day in 0 until 5) {
