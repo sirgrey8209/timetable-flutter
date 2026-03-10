@@ -43,6 +43,9 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             ComponentName(context, TimetableWidgetProvider::class.java)
         )
 
+        // 디버그: 받은 액션 표시
+        Toast.makeText(context, "액션: ${intent.action}", Toast.LENGTH_SHORT).show()
+
         when (intent.action) {
             ACTION_REFRESH -> {
                 // 새로고침: API 호출
@@ -51,10 +54,12 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             }
             ACTION_PREV_WEEK -> {
                 // 이전 주차
+                Toast.makeText(context, "이전 주차", Toast.LENGTH_SHORT).show()
                 changeWeek(context, -1)
             }
             ACTION_NEXT_WEEK -> {
                 // 다음 주차
+                Toast.makeText(context, "다음 주차", Toast.LENGTH_SHORT).show()
                 changeWeek(context, 1)
             }
             ACTION_OPEN_APP -> {
