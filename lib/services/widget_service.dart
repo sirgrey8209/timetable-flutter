@@ -6,7 +6,7 @@ import '../utils/constants.dart';
 
 class WidgetService {
   static const String _appGroupId = 'group.com.estelle.timetable_widget';
-  static const String _androidWidgetName = 'TimetableWidgetProvider';
+  static const String _androidWidgetName = 'TimetableGlanceReceiver';
 
   /// 모바일 플랫폼인지 확인
   static bool get _isMobile => Platform.isAndroid || Platform.isIOS;
