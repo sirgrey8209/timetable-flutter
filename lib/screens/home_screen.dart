@@ -211,6 +211,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} $hour:$minute:$second';
   }
 
+  /// 현재 선택된 주차가 오늘 날짜가 포함된 주차인지 확인
+  bool _isCurrentWeek() {
+    if (_weeks.isEmpty || _currentWeekIndex >= _weeks.length) return false;
+    final currentWeek = ApiService.findCurrentWeek(_weeks);
+    return _weeks[_currentWeekIndex].weekNumber == currentWeek;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -352,8 +359,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     final now = DateTime.now();
-    final todayIndex = TimetableData.getDayIndex(now);
-    final currentPeriod = TimetableData.getCurrentPeriod(now);
+
+    // 현재 주차인지 확인 (현재 주차에서만 오늘/현재 교시 하이라이트)
+    final isCurrentWeek = _isCurrentWeek();
+    final todayIndex = isCurrentWeek ? TimetableData.getDayIndex(now) : -1;
+    final currentPeriod = isCurrentWeek ? TimetableData.getCurrentPeriod(now) : -1;
 
     // PageView로 슬라이드 애니메이션 구현
     return PageView.builder(

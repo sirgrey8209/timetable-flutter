@@ -64,7 +64,8 @@ class TimetableData {
   final String lastUpdate;
   final List<String> subjects;
   final List<String> teachers;
-  final List<List<int>> schedule; // [요일][교시] = 코드
+  final List<List<int>> schedule; // [요일][교시] = 코드 (현재 시간표)
+  final List<List<int>> originalSchedule; // [요일][교시] = 코드 (원래 시간표)
   final List<WeekInfo> weeks;
 
   TimetableData({
@@ -73,6 +74,7 @@ class TimetableData {
     required this.subjects,
     required this.teachers,
     required this.schedule,
+    required this.originalSchedule,
     required this.weeks,
   });
 
@@ -96,10 +98,29 @@ class TimetableData {
         ?.map((e) => e.toString())
         .toList() ?? [];
 
-    // 시간표 데이터 파싱 (1학년 3반)
-    // API 구조: 자료481[학년][반][요일] (각 레벨의 인덱스 0은 메타데이터)
-    // 예: classData = [5, [월요일데이터], [화요일데이터], ...]
-    final scheduleData = json['자료481'];
+    // 현재 시간표 파싱 (자료481)
+    final schedule = _parseSchedule(json['자료481']);
+
+    // 원래 시간표 파싱 (자료147)
+    final originalSchedule = _parseSchedule(json['자료147']);
+
+    // 주차 정보
+    final weeksData = json['일자자료'] as List<dynamic>? ?? [];
+    final weeks = weeksData.map((w) => WeekInfo.fromList(w as List)).toList();
+
+    return TimetableData(
+      startDate: startDate,
+      lastUpdate: lastUpdate,
+      subjects: subjects,
+      teachers: teachers,
+      schedule: schedule,
+      originalSchedule: originalSchedule,
+      weeks: weeks,
+    );
+  }
+
+  /// 시간표 데이터 파싱 (1학년 3반)
+  static List<List<int>> _parseSchedule(dynamic scheduleData) {
     List<List<int>> schedule = [];
 
     if (scheduleData != null && scheduleData is List && scheduleData.length > 1) {
@@ -126,18 +147,7 @@ class TimetableData {
       }
     }
 
-    // 주차 정보
-    final weeksData = json['일자자료'] as List<dynamic>? ?? [];
-    final weeks = weeksData.map((w) => WeekInfo.fromList(w as List)).toList();
-
-    return TimetableData(
-      startDate: startDate,
-      lastUpdate: lastUpdate,
-      subjects: subjects,
-      teachers: teachers,
-      schedule: schedule,
-      weeks: weeks,
-    );
+    return schedule;
   }
 
   /// 특정 요일, 교시의 수업 정보 가져오기
@@ -150,6 +160,20 @@ class TimetableData {
 
     final code = daySchedule[period];
     return ClassInfo.fromCode(code, subjects, teachers);
+  }
+
+  /// 특정 요일, 교시의 수업이 변경되었는지 확인
+  bool isChanged(int dayIndex, int period) {
+    final dayIdx = dayIndex + 1;
+
+    // 범위 체크
+    if (dayIdx >= schedule.length || dayIdx >= originalSchedule.length) return false;
+    if (period >= schedule[dayIdx].length || period >= originalSchedule[dayIdx].length) return false;
+
+    final current = schedule[dayIdx][period];
+    final original = originalSchedule[dayIdx][period];
+
+    return current != original;
   }
 
   /// 날짜로 요일 인덱스 계산 (월=0, ..., 금=4, 주말=-1)

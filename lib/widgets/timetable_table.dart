@@ -19,7 +19,7 @@ class TimetableTable extends StatelessWidget {
     return Table(
       border: TableBorder.all(color: Colors.grey.shade300),
       columnWidths: const {
-        0: FixedColumnWidth(60),
+        0: FixedColumnWidth(30),
       },
       children: [
         // 헤더 행
@@ -49,14 +49,25 @@ class TimetableTable extends StatelessWidget {
           TableCell(
             child: Container(
               color: i == todayIndex ? const Color(0xFFE3F2FD) : null,
-              padding: const EdgeInsets.all(8),
-              child: Text(
-                TimetableConstants.dayNames[i],
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: i == todayIndex ? Colors.blue.shade700 : null,
-                ),
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              child: Column(
+                children: [
+                  Text(
+                    _getDayDate(i),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: i == todayIndex ? Colors.blue.shade400 : Colors.grey.shade500,
+                    ),
+                  ),
+                  Text(
+                    TimetableConstants.dayNames[i],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: i == todayIndex ? Colors.blue.shade700 : null,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -91,10 +102,13 @@ class TimetableTable extends StatelessWidget {
 
   TableCell _buildClassCell(int dayIndex, int period, bool isCurrent) {
     final isToday = dayIndex == todayIndex;
+    final isChanged = timetable.isChanged(dayIndex, period);
     final classInfo = timetable.getClass(dayIndex, period);
 
     Color? bgColor;
-    if (isToday && isCurrent) {
+    if (isChanged) {
+      bgColor = const Color(0xFFFFCDD2); // 변경된 수업 - 연한 빨강
+    } else if (isToday && isCurrent) {
       bgColor = const Color(0xFFC8E6C9); // 오늘 + 현재 교시
     } else if (isCurrent) {
       bgColor = const Color(0xFFFFF9C4); // 현재 교시
@@ -113,9 +127,10 @@ class TimetableTable extends StatelessWidget {
                   Text(
                     classInfo.subject,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
+                      color: isChanged ? Colors.red.shade700 : null,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -124,7 +139,7 @@ class TimetableTable extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 10,
-                      color: Colors.grey.shade600,
+                      color: isChanged ? Colors.red.shade400 : Colors.grey.shade600,
                     ),
                   ),
                 ],
@@ -136,6 +151,6 @@ class TimetableTable extends StatelessWidget {
 
   String _getDayDate(int dayIndex) {
     final date = timetable.startDate.add(Duration(days: dayIndex));
-    return '${date.day}';
+    return '${date.month}/${date.day}';
   }
 }
