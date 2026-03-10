@@ -178,9 +178,8 @@ class TimetableWidgetProvider : AppWidgetProvider() {
             // 클릭 이벤트 설정
             setupClickActions(context, views)
 
-            // 상단 네비게이션 업데이트
-            views.setTextViewText(R.id.week_label, weekLabel)
-            views.setTextViewText(R.id.date_range, dateRange)
+            // 상단 네비게이션 업데이트 (Button에 텍스트 설정)
+            views.setTextViewText(R.id.date_container, "$weekLabel$dateRange")
 
             // 헤더 날짜 및 배경색 설정
             setHeaderDates(views, startDateStr, effectiveTodayIndex)
