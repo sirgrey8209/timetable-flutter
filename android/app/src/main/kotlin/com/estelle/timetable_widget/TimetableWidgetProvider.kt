@@ -37,30 +37,30 @@ class TimetableWidgetProvider : AppWidgetProvider() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        super.onReceive(context, intent)
-
-        val appWidgetManager = AppWidgetManager.getInstance(context)
-        val appWidgetIds = appWidgetManager.getAppWidgetIds(
-            ComponentName(context, TimetableWidgetProvider::class.java)
-        )
-
+        // 커스텀 액션을 먼저 처리
         when (intent.action) {
             ACTION_REFRESH -> {
                 fetchTimetableData(context)
+                return
             }
             ACTION_PREV_WEEK -> {
                 changeWeek(context, -1)
+                return
             }
             ACTION_NEXT_WEEK -> {
                 changeWeek(context, 1)
+                return
             }
             ACTION_OPEN_APP -> {
                 // 앱 열기
                 val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
                 launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(launchIntent)
+                return
             }
         }
+        // 시스템 액션은 부모 클래스에서 처리
+        super.onReceive(context, intent)
     }
 
     override fun onEnabled(context: Context) {
@@ -213,7 +213,7 @@ class TimetableWidgetProvider : AppWidgetProvider() {
         // Android 버전에 따른 PendingIntent 플래그
         private fun getPendingIntentFlags(): Int {
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             } else {
                 PendingIntent.FLAG_UPDATE_CURRENT
             }
