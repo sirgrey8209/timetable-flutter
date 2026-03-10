@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 import 'package:home_widget/home_widget.dart';
 import '../models/timetable.dart';
 import '../utils/constants.dart';
@@ -7,13 +8,18 @@ class WidgetService {
   static const String _appGroupId = 'group.com.estelle.timetable_widget';
   static const String _androidWidgetName = 'TimetableWidgetProvider';
 
+  /// 모바일 플랫폼인지 확인
+  static bool get _isMobile => Platform.isAndroid || Platform.isIOS;
+
   /// 위젯 초기화
   static Future<void> initialize() async {
+    if (!_isMobile) return;
     await HomeWidget.setAppGroupId(_appGroupId);
   }
 
   /// 위젯 데이터 업데이트
   static Future<void> updateWidget(TimetableData timetable) async {
+    if (!_isMobile) return;
     final now = DateTime.now();
     final todayIndex = TimetableData.getDayIndex(now);
     final currentPeriod = TimetableData.getCurrentPeriod(now);
@@ -52,6 +58,7 @@ class WidgetService {
 
   /// 위젯 클릭 콜백 설정
   static void registerInteractivityCallback(Future<void> Function(Uri?) callback) {
+    if (!_isMobile) return;
     HomeWidget.widgetClicked.listen(callback);
   }
 }

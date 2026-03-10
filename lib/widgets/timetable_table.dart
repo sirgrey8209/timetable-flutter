@@ -39,7 +39,7 @@ class TimetableTable extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.all(8),
             child: Text(
-              '교시',
+              '',
               textAlign: TextAlign.center,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
@@ -50,24 +50,13 @@ class TimetableTable extends StatelessWidget {
             child: Container(
               color: i == todayIndex ? const Color(0xFFE3F2FD) : null,
               padding: const EdgeInsets.all(8),
-              child: Column(
-                children: [
-                  Text(
-                    TimetableConstants.dayNames[i],
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: i == todayIndex ? Colors.blue.shade700 : null,
-                    ),
-                  ),
-                  Text(
-                    _getDayDate(i),
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
+              child: Text(
+                TimetableConstants.dayNames[i],
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: i == todayIndex ? Colors.blue.shade700 : null,
+                ),
               ),
             ),
           ),
@@ -85,20 +74,11 @@ class TimetableTable extends StatelessWidget {
           child: Container(
             color: isCurrent ? const Color(0xFFFFF9C4) : Colors.grey.shade50,
             padding: const EdgeInsets.all(8),
-            child: Column(
-              children: [
-                Text(
-                  '$period교시',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  TimetableConstants.periodTimes[period - 1],
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
+            child: Center(
+              child: Text(
+                '$period',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ),

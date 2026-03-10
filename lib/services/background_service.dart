@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import 'package:workmanager/workmanager.dart';
 import '../models/timetable.dart';
@@ -7,6 +8,9 @@ import 'cache_service.dart';
 import 'widget_service.dart';
 
 const String backgroundTaskName = 'timetableUpdate';
+
+/// 모바일 플랫폼인지 확인
+bool get _isMobile => Platform.isAndroid || Platform.isIOS;
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
@@ -42,6 +46,7 @@ void callbackDispatcher() {
 class BackgroundService {
   /// 백그라운드 작업 초기화
   static Future<void> initialize() async {
+    if (!_isMobile) return;
     await Workmanager().initialize(
       callbackDispatcher,
       isInDebugMode: false,
@@ -50,6 +55,7 @@ class BackgroundService {
 
   /// 주기적 갱신 등록 (1시간마다)
   static Future<void> registerPeriodicTask() async {
+    if (!_isMobile) return;
     await Workmanager().registerPeriodicTask(
       'timetable-update-task',
       backgroundTaskName,
@@ -62,6 +68,7 @@ class BackgroundService {
 
   /// 즉시 갱신
   static Future<void> runImmediateTask() async {
+    if (!_isMobile) return;
     await Workmanager().registerOneOffTask(
       'timetable-immediate-update',
       backgroundTaskName,

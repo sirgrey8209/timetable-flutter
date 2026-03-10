@@ -1,6 +1,6 @@
 /// 컴시간 API 관련 상수
 class ApiConstants {
-  static const String baseUrl = 'https://estelle-hub.mooo.com/api/comci';
+  static const String baseUrl = 'http://comci.net:4082';
   static const int schoolCode = 27224;
   static const int apiPrefix = 73629;
   static const int grade = 1;

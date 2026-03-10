@@ -77,9 +77,11 @@ class TimetableData {
   });
 
   factory TimetableData.fromJson(Map<String, dynamic> json) {
-    // 시작일 파싱
-    final startDateStr = json['시작일'] as String;
-    final startDate = DateTime.parse(startDateStr);
+    // 시작일 파싱 (null 안전 처리)
+    final startDateStr = json['시작일'] as String? ?? '';
+    final startDate = startDateStr.isNotEmpty
+        ? DateTime.parse(startDateStr)
+        : DateTime.now();
 
     // 마지막 업데이트
     final lastUpdate = json['자료244'] as String? ?? '';
@@ -95,20 +97,31 @@ class TimetableData {
         .toList() ?? [];
 
     // 시간표 데이터 파싱 (1학년 3반)
+    // API 구조: 자료481[학년][반][요일] (각 레벨의 인덱스 0은 메타데이터)
+    // 예: classData = [5, [월요일데이터], [화요일데이터], ...]
     final scheduleData = json['자료481'];
     List<List<int>> schedule = [];
 
-    if (scheduleData != null) {
-      final gradeData = scheduleData['1'] ?? scheduleData[1];
-      if (gradeData != null) {
-        final classData = gradeData['3'] ?? gradeData[3];
-        if (classData != null && classData is List) {
-          schedule = classData.map((day) {
+    if (scheduleData != null && scheduleData is List && scheduleData.length > 1) {
+      // 1학년 = index 1
+      final gradeData = scheduleData[1];
+
+      if (gradeData != null && gradeData is List && gradeData.length > 3) {
+        // 3반 = index 3 (index 0은 반 수)
+        final classData = gradeData[3];
+
+        if (classData != null && classData is List && classData.length > 1) {
+          // classData[0]은 요일 수(메타), classData[1]부터 실제 요일 데이터
+          for (int i = 0; i < classData.length; i++) {
+            final day = classData[i];
             if (day is List) {
-              return day.map((code) => code is int ? code : 0).toList().cast<int>();
+              // day[0]은 교시 수(메타), day[1]부터 실제 교시 데이터
+              final periods = day.map((code) => code is int ? code : 0).toList().cast<int>();
+              schedule.add(periods);
+            } else {
+              schedule.add(<int>[]);
             }
-            return <int>[];
-          }).toList().cast<List<int>>();
+          }
         }
       }
     }
